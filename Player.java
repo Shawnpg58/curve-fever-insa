@@ -115,6 +115,9 @@ public void releaseRight() {isRightPressed = false;}
 public void pressLeft() {isLeftPressed = true;}
 public void releaseLeft() {isLeftPressed = false;}
 
+public float getXpos() {return xpos;}
+public float getYpos() {return ypos;}
+
 public boolean equals(Player p) {return playerID == p.getPlayerID();}
 public boolean isAlive() {return alive;}
 public void kill() 

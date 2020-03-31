@@ -22,7 +22,19 @@ public class Engine extends JPanel
         WINDOW_HEIGHT = height;
         WINDOW_WIDTH = width;
         numberOfPlayers = playerCount;
-        gameWorld = new JPanel();
+
+        lastTimeMillis = System.currentTimeMillis();
+
+        playerList = new ArrayList<Player>();
+        Color[] colors = {Color.RED, Color.GREEN, Color.PINK};
+
+        for(int i = 0; i <= numberOfPlayers; i++)
+        {
+            //TODO random position
+            playerList.add(new Player((float)((i+1) * 100), (float)((i+1) * 100), colors[i]));
+        }
+
+        gameWorld = new gameWorld(playerList);
         gameWorld.setSize(WINDOW_WIDTH*3/4, WINDOW_HEIGHT);
         gameWorld.setLocation(WINDOW_WIDTH/4, 0);
         gameWorld.setBackground(Color.BLACK);
@@ -34,29 +46,8 @@ public class Engine extends JPanel
 
         add(gameWorld);
         add(scoreBoard);
-
-        lastTimeMillis = System.currentTimeMillis();
-
-        playerList = new ArrayList<Player>();
-        Color[] colors = {Color.RED, Color.GREEN, Color.PINK};
-
-        for(int i = 0; i <= numberOfPlayers; i++)
-        {
-            playerList.add(new Player((float)((i+1) * 100), (float)((i+1) * 100), colors[i]));
-            add(playerList.get(i));
-        }
+        
         addInput();
-    }
-
-    @Override
-    public void paintComponent(Graphics g)
-    {
-        super.paintComponent(g);
-        for(Player i : playerList)
-        {
-            i.paint(g);
-        }
-        repaint();
     }
     
     public void update(float dt)
@@ -84,6 +75,11 @@ public class Engine extends JPanel
     public boolean checkCollision(Player player)
     {
         //TODO add case for oout of bounds
+        if(player.getXpos() > gameWorld.getWidth() || player.getYpos() > gameWorld.getHeight() || player.getXpos() < 0 || player.getYpos() < 0)
+        {
+            return true;
+        }
+
         boolean result = false;
         if(player.getWall().size() < 4)
         {
@@ -91,7 +87,7 @@ public class Engine extends JPanel
         }
 
         ArrayList<Point> playerWall = player.getWall();
-        Point playerPoint1 = playerWall.get(playerWall.size()-1);
+        Point playerPoint1 = playerWall.get(playerWall.size() -1 );
         Point playerPoint2 = playerWall.get(playerWall.size() -2 );
 
         for (Player i : playerList)
