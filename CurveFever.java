@@ -8,11 +8,13 @@ public class CurveFever extends JFrame
     Engine engine;
     Timer gameLoopTimer;
     final int TIMER_LOOP_DURATION = 16;
+    final int WINDOW_WIDTH = 640;
+    final int WINDOW_HEIGHT = 480;
 
     public CurveFever()
     {
         super("Curve Fever");
-        setSize(512, 512);
+        setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
         menu = new MainMenu(this);
         add(menu);
 
@@ -30,7 +32,7 @@ public class CurveFever extends JFrame
         remove(menu);
         repaint();
 
-        engine = new Engine(players);
+        engine = new Engine(players, WINDOW_WIDTH, WINDOW_HEIGHT);
         add(engine);
         revalidate();
         

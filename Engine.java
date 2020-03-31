@@ -1,57 +1,51 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Line2D;
-import java.time.Clock;
 import java.util.*;
 
 public class Engine extends JPanel
 {
     ArrayList<Player> playerList;
-    //TODO remove this
-    KeyStroke playerOneLeftKey = KeyStroke.getKeyStroke("A");
-    //
     int numberOfPlayers;
     long lastTimeMillis;
     boolean isPlaying = true;
+    int WINDOW_WIDTH;
+    int WINDOW_HEIGHT;
+    JPanel gameWorld;
+    JPanel scoreBoard;
+    
 
-    public Engine(int playerCount)
+    public Engine(int playerCount, int width, int height)
     {
+        setLayout(new BorderLayout());
+
+        WINDOW_HEIGHT = height;
+        WINDOW_WIDTH = width;
         numberOfPlayers = playerCount;
+        gameWorld = new JPanel();
+        gameWorld.setSize(WINDOW_WIDTH*3/4, WINDOW_HEIGHT);
+        gameWorld.setLocation(WINDOW_WIDTH/4, 0);
+        gameWorld.setBackground(Color.BLACK);
+        
+        scoreBoard = new JPanel();
+        scoreBoard.setSize(WINDOW_WIDTH/4, WINDOW_HEIGHT);
+        scoreBoard.setLocation(0, 0);
+        scoreBoard.setBackground(Color.GREEN);
+
+        add(gameWorld);
+        add(scoreBoard);
+
         lastTimeMillis = System.currentTimeMillis();
-        setBackground(Color.BLACK);
+
         playerList = new ArrayList<Player>();
-        //placeholder
-        Color[] colors = {Color.RED, Color.GREEN};
+        Color[] colors = {Color.RED, Color.GREEN, Color.PINK};
 
         for(int i = 0; i <= numberOfPlayers; i++)
         {
             playerList.add(new Player((float)((i+1) * 100), (float)((i+1) * 100), colors[i]));
             add(playerList.get(i));
         }
-        //placeholder
-
-        //keybindings (not too clean since it's hard coded variables)
-        //TODO replace with a add input function
-        //player 1
-        int playerID = 0;
-        InputMap inputMap = getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW);
-        
-        inputMap.put(KeyStroke.getKeyStroke("pressed A"), "playerOneLeftDown");
-        getActionMap().put("playerOneLeftDown", new turnAction(playerList.get(playerID), playerList.get(playerID).LEFT_DOWN));
-        inputMap.put(KeyStroke.getKeyStroke("pressed D"), "playerOneRightDown");
-        getActionMap().put("playerOneRightDown", new turnAction(playerList.get(playerID), playerList.get(playerID).RIGHT_DOWN));
-        inputMap.put(KeyStroke.getKeyStroke("released A"), "playerOneLeftUp");
-        getActionMap().put("playerOneLeftUp", new turnAction(playerList.get(playerID), playerList.get(playerID).LEFT_UP));
-        inputMap.put(KeyStroke.getKeyStroke("released D"), "playerOneRightUp");
-        getActionMap().put("playerOneRightUp", new turnAction(playerList.get(playerID), playerList.get(playerID).RIGHT_UP));
-        
-        
-        
-
-
-        //player 2
-
-        //player 3
+        addInput();
     }
 
     @Override
@@ -67,18 +61,15 @@ public class Engine extends JPanel
     
     public void update(float dt)
     {
-        for(int i = 0; i < playerList.size(); i++)
+        for(Player p : playerList)
         {
-            Player p = playerList.get(i);
-            p.update(dt);
-            if(checkCollision(p))
+            if (p.isAlive()) 
             {
-                p.kill();
-            }
-
-            if(!p.isAlive())
-            {
-                playerList.remove(i);
+                p.update(dt);
+                if (checkCollision(p)) 
+                {
+                    p.kill();
+                }
             }
         }
     }
@@ -139,19 +130,28 @@ public class Engine extends JPanel
     private void addInput()
     {
         //TODO finish this function
-        /*
-        String[] playerKeys = {"A", "D", "left", "right", "H", "K"};
+        
+        String[] playerKeys = {"A", "D", "LEFT", "RIGHT", "H", "K"};
         InputMap inputMap = getInputMap(JPanel.WHEN_IN_FOCUSED_WINDOW);
 
-        inputMap.put(KeyStroke.getKeyStroke("pressed A"), "playerOneLeftDown");
-        getActionMap().put("playerOneLeftDown", new turnAction(playerList.get(playerID), playerList.get(playerID).LEFT_DOWN));
-        inputMap.put(KeyStroke.getKeyStroke("pressed D"), "playerOneRightDown");
-        getActionMap().put("playerOneRightDown", new turnAction(playerList.get(playerID), playerList.get(playerID).RIGHT_DOWN));
-        inputMap.put(KeyStroke.getKeyStroke("released A"), "playerOneLeftUp");
-        getActionMap().put("playerOneLeftUp", new turnAction(playerList.get(playerID), playerList.get(playerID).LEFT_UP));
-        inputMap.put(KeyStroke.getKeyStroke("released D"), "playerOneRightUp");
-        getActionMap().put("playerOneRightUp", new turnAction(playerList.get(playerID), playerList.get(playerID).RIGHT_UP));
-        
-        */
+        for(int playerID = 0; playerID < playerList.size(); playerID++)
+        {
+            inputMap.put(KeyStroke.getKeyStroke("pressed " + playerKeys[(playerID*2)]), "playerLeftDown" + playerID);
+            getActionMap().put("playerLeftDown" + playerID,
+                    new turnAction(playerList.get(playerID), playerList.get(playerID).LEFT_DOWN));
+
+            inputMap.put(KeyStroke.getKeyStroke("released " + playerKeys[(playerID*2)]), "playerLeftUp" + playerID);
+            getActionMap().put("playerLeftUp" + playerID,
+                    new turnAction(playerList.get(playerID), playerList.get(playerID).LEFT_UP));
+
+            inputMap.put(KeyStroke.getKeyStroke("pressed " + playerKeys[(playerID*2)+1]), "playerRightDown" + playerID);
+            getActionMap().put("playerRightDown" + playerID,
+                    new turnAction(playerList.get(playerID), playerList.get(playerID).RIGHT_DOWN));
+
+            inputMap.put(KeyStroke.getKeyStroke("released " + playerKeys[(playerID*2)+1]), "playerRightUp" + playerID);
+            getActionMap().put("playerRightUp" + playerID,
+                    new turnAction(playerList.get(playerID), playerList.get(playerID).RIGHT_UP));
+
+        }
     }
 }
